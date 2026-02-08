@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a070f" />
+      <stop offset="100%" stop-color="#05040a" />
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f25b5b" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#2b0f18" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)" />
+  <g transform="translate(120,140)" fill="none" stroke="url(#rim)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
+    <path d="M220 60 C180 80 150 120 150 170 C150 220 185 255 240 260" />
+    <path d="M240 260 C300 265 335 250 360 210" />
+    <path d="M360 210 C380 180 405 170 430 170" />
+    <path d="M240 260 C240 320 260 360 290 400" />
+    <path d="M290 400 C320 440 345 470 360 510" />
+    <path d="M205 210 C210 250 220 300 230 340" />
+    <path d="M230 340 C245 400 230 450 210 490" />
+    <path d="M210 490 C190 525 165 555 140 580" />
+    <path d="M140 580 C180 590 240 585 300 560" />
+  </g>
+  <g transform="translate(120,140)" fill="#0e0a13" opacity="0.85">
+    <path d="M220 70 C170 100 145 135 145 180 C145 240 195 280 260 275 C330 270 360 230 385 190 C410 150 460 150 500 170 C520 210 480 300 470 340 C460 380 440 460 455 500 C470 540 420 565 360 560 C300 555 240 560 190 590 C170 610 150 620 130 610 C170 560 210 520 215 470 C220 420 240 380 240 330 C240 300 230 250 220 210 C210 170 220 120 260 95 C280 80 300 70 330 65 C310 50 260 50 220 70 Z" />
+    <path d="M385 190 C400 170 430 160 460 170 C470 200 450 230 420 240" />
+    <path d="M250 110 C285 90 330 95 360 120" />
+  </g>
+  <g transform="translate(120,140)" fill="#1b131f" opacity="0.9">
+    <path d="M120 560 C180 540 230 520 280 520 C330 520 380 540 420 560 C380 620 300 660 200 650 C170 640 140 610 120 560 Z" />
+  </g>
+</svg>

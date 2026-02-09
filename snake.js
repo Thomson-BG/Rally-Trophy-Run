@@ -32,7 +32,7 @@
   const LEADERBOARD_LIMIT = 8;
   const CONFIG = {
     // Paste your deployed Apps Script web app URL here.
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzvlZDa8QlpVhbhWvMKP85k1NmWrozz5i040vbFMLpBi9QQ-rxQMRVPYD8ZpwkQrJY/exec',
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxtRGiUjTs-R2tEL-voXWlCljNS3cxWLB6_Kl6qz1MGAYpTGb5ubugFZOwkwtFgbwH0Lw/exec',
     topLimit: LEADERBOARD_LIMIT
   };
 

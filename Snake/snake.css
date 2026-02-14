@@ -584,6 +584,30 @@ a {
 
 .drag-canvas-wrap {
   position: relative;
+  isolation: isolate;
+}
+
+.drag-canvas-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 36%),
+    radial-gradient(circle at 82% 12%, rgba(255, 220, 164, 0.28), rgba(255, 220, 164, 0) 42%);
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+.drag-canvas-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.48) 100%);
+  z-index: 2;
 }
 
 #drag-canvas {
@@ -598,7 +622,8 @@ a {
     0 0 20px rgba(102, 156, 222, 0.2);
   touch-action: none;
   image-rendering: auto;
-  filter: saturate(1.12) contrast(1.08) brightness(1.03);
+  filter: saturate(1.2) contrast(1.14) brightness(1.04);
+  z-index: 1;
 }
 
 .drag-overlay-shift-btn {

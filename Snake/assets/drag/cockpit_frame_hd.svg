@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#73869d"/>
+      <stop offset="0.42" stop-color="#3f4f66"/>
+      <stop offset="1" stop-color="#1b2533"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#10161f"/>
+      <stop offset="1" stop-color="#04070c"/>
+    </linearGradient>
+    <radialGradient id="glass" cx="50%" cy="10%" r="72%">
+      <stop offset="0" stop-color="#b2d2ff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#b2d2ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g opacity="0.95">
+    <path d="M0 0H3840V270C3200 300 2600 320 1920 320C1250 320 650 300 0 270Z" fill="url(#dark)"/>
+    <path d="M0 0H3840V180C3200 210 2600 232 1920 232C1240 232 640 210 0 180Z" fill="url(#metal)" opacity="0.86"/>
+    <rect x="0" y="0" width="3840" height="180" fill="url(#glass)"/>
+  </g>
+  <g opacity="0.88">
+    <path d="M0 1460C420 1350 790 1300 1920 1290C3040 1300 3410 1350 3840 1460V2160H0Z" fill="url(#dark)"/>
+    <path d="M0 1510C490 1390 950 1342 1920 1338C2890 1342 3350 1390 3840 1510V2160H0Z" fill="url(#metal)" opacity="0.54"/>
+  </g>
+  <g opacity="0.38">
+    <rect x="270" y="1630" width="128" height="470" rx="28" fill="#5f738d"/>
+    <rect x="3442" y="1630" width="128" height="470" rx="28" fill="#5f738d"/>
+  </g>
+  <g opacity="0.28">
+    <rect x="0" y="2050" width="3840" height="110" fill="#000"/>
+  </g>
+</svg>

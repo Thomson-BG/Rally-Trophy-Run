@@ -197,3 +197,16 @@ Original prompt: Build a classic Snake game in this repo with modern skins and a
   - Added dynamic roadside pole lighting with projected shadows for additional depth cues.
   - Upgraded full-throttle exhaust effects with brighter flames, glow particles, and shockwave rings.
   - Validation: `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed.
+- Drag realism overhaul:
+  - Added generated HD SVG texture/model assets under `/Users/joshuathomson/Documents/Projects/Codex/Snake/assets/drag/`:
+    - `track_skyline_hd.svg`
+    - `grandstand_strip_hd.svg`
+    - `asphalt_detail_tile.svg`
+    - `cockpit_frame_hd.svg`
+    - `dashboard_cluster_hd.svg`
+  - Updated drag renderer to use new assets as primary texture/model inputs.
+  - Added dedicated drag mini-game splash phase (`phase: splash`) with animated intro card before cinematic/countdown.
+  - Moved player perspective to right lane by applying lane-biased camera framing; opponent now spawns in left lane only.
+  - NPC opponent now receives a randomized target finish time each race (`targetFinishMs`), with adaptive assist to stay competitive.
+  - Added extra realism layers: lens flare, atmospheric haze, post-process bloom/grade, pole shadows/lights, and enhanced flame/shockwave exhaust VFX.
+  - Validation: `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed.

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="1024" viewBox="0 0 4096 1024">
+  <defs>
+    <linearGradient id="stand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8e4f4"/>
+      <stop offset="0.46" stop-color="#7e94b0"/>
+      <stop offset="1" stop-color="#31455f"/>
+    </linearGradient>
+    <pattern id="crowd" width="20" height="18" patternUnits="userSpaceOnUse">
+      <rect width="20" height="18" fill="none"/>
+      <circle cx="4" cy="5" r="2.2" fill="#f4d09a"/>
+      <circle cx="10" cy="6" r="2.1" fill="#d9e7ff"/>
+      <circle cx="16" cy="5.5" r="2.1" fill="#f09c81"/>
+      <circle cx="7" cy="13" r="2.3" fill="#7bc2ff"/>
+      <circle cx="14" cy="12.5" r="2.2" fill="#ff6868"/>
+    </pattern>
+  </defs>
+  <rect width="4096" height="1024" fill="url(#stand)"/>
+  <g opacity="0.88">
+    <rect y="250" width="4096" height="410" fill="url(#crowd)"/>
+  </g>
+  <g opacity="0.42">
+    <rect y="218" width="4096" height="12" fill="#f6fbff"/>
+    <rect y="276" width="4096" height="4" fill="#1e2c3f"/>
+    <rect y="340" width="4096" height="4" fill="#1b2736"/>
+    <rect y="404" width="4096" height="4" fill="#1b2736"/>
+    <rect y="468" width="4096" height="4" fill="#1b2736"/>
+    <rect y="532" width="4096" height="4" fill="#1b2736"/>
+    <rect y="596" width="4096" height="4" fill="#1b2736"/>
+  </g>
+  <g opacity="0.76">
+    <rect y="160" width="4096" height="52" fill="#6a87ac"/>
+    <rect y="690" width="4096" height="88" fill="#2a3e58"/>
+    <rect y="778" width="4096" height="128" fill="#1c2a3c"/>
+  </g>
+</svg>

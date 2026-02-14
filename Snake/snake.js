@@ -125,6 +125,7 @@
   const DRAG_FIRST_TRIGGER_TROPHY = 3;
   const DRAG_TRIGGER_INTERVAL = 20;
   const DRAG_CINEMATIC_MS = 6000;
+  const DRAG_SPLASH_MS = 2600;
   const DRAG_COUNTDOWN_MS = 3500;
   const DRAG_RACE_MS = 45000;
   const DRAG_RESULTS_MS = 5000;
@@ -144,6 +145,9 @@
   const DRAG_IDLE_RPM = 1050;
   const DRAG_REDLINE_RPM = 9100;
   const DRAG_GEAR_RATIOS = [3.42, 1.28];
+  const DRAG_PLAYER_LANE_OFFSET = 0.28;
+  const DRAG_OPPONENT_LANE_OFFSET = -0.28;
+  const DRAG_LANE_RENDER_FACTOR = 0.34;
   const DRAG_SCORED_SHIFT_KEYS = new Set(['1-2']);
   const DRAG_SHIFT_PERFECT_MIN_MPH = 108;
   const DRAG_SHIFT_PERFECT_MAX_MPH = 112;
@@ -165,11 +169,11 @@
   const DRAG_MAX_SPEED_MPS = 155;
   const DRAG_PARTICLE_MAX = { high: 320, medium: 200, low: 110 };
   const DRAG_VISUAL_ASSET_PATHS = {
-    cockpit_frame_hd: 'assets/drag/cockpit_frame_hd.png',
-    dashboard_cluster_hd: 'assets/drag/dashboard_cluster_hd.png',
-    track_skyline_hd: 'assets/drag/track_skyline_hd.jpg',
-    grandstand_strip_hd: 'assets/drag/grandstand_strip_hd.png',
-    asphalt_detail_tile: 'assets/drag/asphalt_detail_tile.png'
+    cockpit_frame_hd: 'assets/drag/cockpit_frame_hd.svg',
+    dashboard_cluster_hd: 'assets/drag/dashboard_cluster_hd.svg',
+    track_skyline_hd: 'assets/drag/track_skyline_hd.svg',
+    grandstand_strip_hd: 'assets/drag/grandstand_strip_hd.svg',
+    asphalt_detail_tile: 'assets/drag/asphalt_detail_tile.svg'
   };
   const DRAG_AUDIO_SAMPLE_PATHS = {
     engine_idle_loop: 'assets/audio/drag/engine_idle_loop.ogg',
@@ -2161,7 +2165,7 @@
   function createDragNpcs(seed) {
     const npcs = [];
     let nextSeed = seed;
-    const laneOffsets = [-0.22, 0.22];
+    const laneOffsets = [DRAG_OPPONENT_LANE_OFFSET];
     for (let i = 0; i < DRAG_NPC_COUNT; i += 1) {
       const powerRoll = lcg(nextSeed);
       nextSeed = powerRoll.seed;
@@ -2169,6 +2173,8 @@
       nextSeed = reactionRoll.seed;
       const shiftRoll = lcg(nextSeed);
       nextSeed = shiftRoll.seed;
+      const finishRoll = lcg(nextSeed);
+      nextSeed = finishRoll.seed;
       npcs.push({
         id: i,
         laneOffset: laneOffsets[i],
@@ -2181,8 +2187,9 @@
         reactionDelayMs: 110 + Math.floor(reactionRoll.value * 300),
         powerFactor: 0.93 + powerRoll.value * 0.17,
         shiftSkill: 0.78 + shiftRoll.value * 0.2,
-        shiftTargetMph: DRAG_SHIFT_TARGET_MPH - 4 + shiftRoll.value * 8,
-        terminalMph: 315 + powerRoll.value * 15,
+        shiftTargetMph: DRAG_SHIFT_TARGET_MPH - 3 + shiftRoll.value * 10,
+        terminalMph: 312 + powerRoll.value * 24,
+        targetFinishMs: 17500 + Math.round(finishRoll.value * 5500),
         color: ['#ff8d4a', '#5eb0ff'][i] || '#ff8d4a',
         launched: false,
         hasShifted: false
@@ -2243,7 +2250,7 @@
     state.seed = npcSetup.seed;
 
     dragState = {
-      phase: 'cinematic',
+      phase: 'splash',
       phaseMs: 0,
       totalMs: 0,
       qualityTier,
@@ -2288,14 +2295,14 @@
 
     if (dragResults) dragResults.classList.add('hidden');
     setDragTreeState({ pre: false, amber: 0, green: false, red: false });
-    if (dragPhaseLabel) dragPhaseLabel.textContent = 'Cinematic';
-    if (dragSubtitle) dragSubtitle.textContent = 'Top Fuel style: launch hard, hold 5.0s, then hit one 110 mph upshift.';
+    if (dragPhaseLabel) dragPhaseLabel.textContent = 'Splash';
+    if (dragSubtitle) dragSubtitle.textContent = 'Top Fuel showdown loading...';
     updateDragHud();
     resizeDragCanvas();
     drawDragScene(performance.now());
     dragModal.classList.remove('hidden');
     startDragEngineAudio();
-    playSound('drag_intro');
+    playSound('splash_rise');
   }
 
   function applyDragLaunch(reactionMs) {
@@ -2470,9 +2477,16 @@
       npc.rpm *= 0.56;
     }
 
+    const trackDistance = dragState ? dragState.trackDistanceM : DRAG_TOTAL_DISTANCE_M;
+    const targetFinishMs = Math.max(16500, npc.targetFinishMs || 23000);
+    const progress = clamp(npc.launchElapsedMs / targetFinishMs, 0, 1);
+    const expectedDistance = trackDistance * (1 - Math.pow(1 - progress, 3));
+    const progressError = (expectedDistance - npc.distanceM) / Math.max(120, trackDistance * 0.34);
+    const raceAssist = clamp(progressError, -0.18, 0.26);
+
     updateDragPhysics(npc, dt, {
       tractionScale: npc.gear === 1 ? (0.82 + npc.powerFactor * 0.06) : (1 + npc.powerFactor * 0.07),
-      accelerationScale: npc.powerFactor * (npc.hasShifted ? 1.12 : 1),
+      accelerationScale: npc.powerFactor * (npc.hasShifted ? 1.12 : 1) * (1 + raceAssist),
       launchElapsedMs: npc.launchElapsedMs
     });
     const terminalMps = (npc.terminalMph || 322) / 2.2369362921;
@@ -2539,7 +2553,7 @@
     dragState.npcs.forEach((npc, index) => {
       advanceDragNpc(npc, deltaMs, dragState.phaseMs);
       if (dragCanvas && npc.speed > 8 && dragState.qualityTier !== 'low') {
-        const centerX = dragCanvas.clientWidth * (0.5 + npc.laneOffset * 0.2);
+        const centerX = dragCanvas.clientWidth * (0.5 + npc.laneOffset * DRAG_LANE_RENDER_FACTOR);
         const centerY = dragCanvas.clientHeight * 0.76 - (npc.distanceM - player.distanceM) * 1.1;
         emitDragExhaust(centerX, centerY, 0.5, 'rgba(200, 210, 228, 0.44)');
       }
@@ -2547,7 +2561,7 @@
         npc.speed *= 0.995;
       }
       if (index === 0 && Math.random() < 0.0004 && dragCanvas && dragState.qualityTier === 'high') {
-        const sx = dragCanvas.clientWidth * (0.5 + npc.laneOffset * 0.2);
+        const sx = dragCanvas.clientWidth * (0.5 + npc.laneOffset * DRAG_LANE_RENDER_FACTOR);
         const sy = dragCanvas.clientHeight * 0.72;
         emitDragSparks(sx, sy);
       }
@@ -2691,7 +2705,10 @@
     }
     if (dragPoints) dragPoints.textContent = `${Math.round(player.points)}`;
     if (dragTime) {
-      if (dragState.phase === 'race') {
+      if (dragState.phase === 'splash') {
+        const remaining = Math.max(0, (DRAG_SPLASH_MS - dragState.phaseMs) / 1000);
+        dragTime.textContent = `${remaining.toFixed(1)}s`;
+      } else if (dragState.phase === 'race') {
         const remainingMs = Math.max(0, DRAG_RACE_MS - dragState.phaseMs);
         dragTime.textContent = `${(remainingMs / 1000).toFixed(1)}s`;
       } else if (dragState.phase === 'countdown') {
@@ -2986,7 +3003,7 @@
     dragCtx.restore();
   }
 
-  function drawDragRoadBackdrop(width, height, flow, speedFactor, now) {
+  function drawDragRoadBackdrop(width, height, flow, speedFactor, now, cameraBias = 0) {
     const horizon = height * 0.34;
     const skylineImage = getDragVisualAsset('track_skyline_hd');
     const standImage = getDragVisualAsset('grandstand_strip_hd');
@@ -3065,11 +3082,12 @@
     const roadBottomY = height * 0.88;
     const roadTopWidth = width * 0.125;
     const roadBottomWidth = width * 1.04;
+    const roadCenterX = width * 0.5 - cameraBias * width * 0.09;
 
-    const topLeft = width / 2 - roadTopWidth / 2;
-    const topRight = width / 2 + roadTopWidth / 2;
-    const bottomLeft = width / 2 - roadBottomWidth / 2;
-    const bottomRight = width / 2 + roadBottomWidth / 2;
+    const topLeft = roadCenterX - roadTopWidth / 2;
+    const topRight = roadCenterX + roadTopWidth / 2;
+    const bottomLeft = roadCenterX - roadBottomWidth / 2;
+    const bottomRight = roadCenterX + roadBottomWidth / 2;
     const lightVectorX = (width * 0.5 - sunX) / width;
     const lightVectorY = (roadBottomY - sunY) / Math.max(1, height);
 
@@ -3236,15 +3254,15 @@
       }
     }
 
-    const specularLine = dragCtx.createLinearGradient(width * 0.5, roadTopY, width * 0.5, roadBottomY);
+    const specularLine = dragCtx.createLinearGradient(roadCenterX, roadTopY, roadCenterX, roadBottomY);
     specularLine.addColorStop(0, 'rgba(255, 252, 238, 0.28)');
     specularLine.addColorStop(0.45, `rgba(255, 244, 208, ${0.07 + speedFactor * 0.05})`);
     specularLine.addColorStop(1, 'rgba(255, 236, 194, 0)');
     dragCtx.strokeStyle = specularLine;
     dragCtx.lineWidth = 6 + speedFactor * 4;
     dragCtx.beginPath();
-    dragCtx.moveTo(width * 0.5, roadTopY + 6);
-    dragCtx.lineTo(width * 0.5, roadBottomY);
+    dragCtx.moveTo(roadCenterX, roadTopY + 6);
+    dragCtx.lineTo(roadCenterX, roadBottomY);
     dragCtx.stroke();
 
     const shadowSwing = Math.sin((now || 0) * 0.00035) * 0.04;
@@ -3543,7 +3561,7 @@
     dragCtx.save();
     dragCtx.translate(shake, 0);
 
-    const road = drawDragRoadBackdrop(width, height, flow, speedFactor, now);
+    const road = drawDragRoadBackdrop(width, height, flow, speedFactor, now, DRAG_PLAYER_LANE_OFFSET);
     const light = {
       x: road.sunX || width * 0.5,
       y: road.sunY || road.horizon - 60
@@ -3560,7 +3578,7 @@
       const y = lerp(road.roadTopY + 10, height * 0.72, closeness);
       const t = clamp((y - road.roadTopY) / (road.roadBottomY - road.roadTopY), 0, 1);
       const roadWidth = lerp(road.roadTopWidth, road.roadBottomWidth, t);
-      const x = width / 2 + npc.laneOffset * roadWidth * 0.22;
+      const x = width / 2 + npc.laneOffset * roadWidth * DRAG_LANE_RENDER_FACTOR;
       const scale = lerp(0.18, 1.0, closeness);
       drawDragOpponentCar(x, y, scale, npc.color, light);
     });
@@ -3634,10 +3652,18 @@
     dragCtx.textAlign = 'left';
     dragCtx.fillText(`POSITION ${rank}/${dragState.npcs.length + 1}`, 24, 38);
     dragCtx.fillText(`DIST ${Math.round(player.distanceM)}m`, 24, 62);
+    dragCtx.fillStyle = 'rgba(245, 232, 198, 0.88)';
+    dragCtx.font = `700 ${Math.max(10, Math.floor(width * 0.013))}px "Orbitron", sans-serif`;
+    dragCtx.fillText('PLAYER LANE: RIGHT', 24, 82);
 
     dragCtx.textAlign = 'right';
+    dragCtx.fillStyle = '#f0f5ff';
+    dragCtx.font = `700 ${Math.max(14, Math.floor(width * 0.018))}px "Orbitron", sans-serif`;
     dragCtx.fillText(`${secs.toFixed(2)} SECONDS LEFT`, width - 24, 38);
     dragCtx.fillText(`POINTS ${Math.round(player.points)}/${DRAG_MAX_POINTS}`, width - 24, 62);
+    dragCtx.fillStyle = 'rgba(245, 232, 198, 0.88)';
+    dragCtx.font = `700 ${Math.max(10, Math.floor(width * 0.013))}px "Orbitron", sans-serif`;
+    dragCtx.fillText('OPPONENT LANE: LEFT', width - 24, 82);
 
     const promptActive = dragState.phase === 'race' && player.launched && !player.hasShifted && player.gear < DRAG_GEAR_RATIOS.length;
     if (promptActive) {
@@ -3667,7 +3693,48 @@
       dragCtx.fillText(player.feedbackText, width * 0.5, height * 0.27);
     }
 
-    if (dragState.phase === 'cinematic') {
+    if (dragState.phase === 'splash') {
+      const t = clamp(dragState.phaseMs / DRAG_SPLASH_MS, 0, 1);
+      const pulse = 0.5 + 0.5 * Math.sin(now / 90);
+      const stripeCount = 18;
+      dragCtx.fillStyle = 'rgba(5, 7, 11, 0.58)';
+      dragCtx.fillRect(0, 0, width, height);
+      dragCtx.save();
+      dragCtx.globalCompositeOperation = 'screen';
+      for (let i = 0; i < stripeCount; i += 1) {
+        const sx = ((i / stripeCount) * width + now * 0.45) % (width + 220) - 110;
+        const grad = dragCtx.createLinearGradient(sx, 0, sx + 160, 0);
+        grad.addColorStop(0, 'rgba(255, 130, 43, 0)');
+        grad.addColorStop(0.5, `rgba(255, 170, 94, ${0.24 + pulse * 0.24})`);
+        grad.addColorStop(1, 'rgba(255, 130, 43, 0)');
+        dragCtx.fillStyle = grad;
+        dragCtx.fillRect(sx, 0, 180, height);
+      }
+      dragCtx.restore();
+
+      dragCtx.textAlign = 'center';
+      dragCtx.fillStyle = '#ffe4c2';
+      dragCtx.font = `900 ${Math.max(34, Math.floor(width * 0.058))}px "Orbitron", sans-serif`;
+      dragCtx.fillText('BULLDOG GARAGE', width * 0.5, height * 0.4);
+      dragCtx.fillStyle = '#ff9a4f';
+      dragCtx.font = `900 ${Math.max(28, Math.floor(width * 0.047))}px "Orbitron", sans-serif`;
+      dragCtx.fillText('TOP FUEL SHOWDOWN', width * 0.5, height * 0.49);
+      dragCtx.fillStyle = `rgba(255, 247, 229, ${0.45 + pulse * 0.45})`;
+      dragCtx.font = `700 ${Math.max(16, Math.floor(width * 0.024))}px "Orbitron", sans-serif`;
+      dragCtx.fillText('LIGHTS UP IN 3...2...1...', width * 0.5, height * 0.57);
+
+      const progressW = width * 0.42;
+      const progressH = Math.max(7, Math.floor(height * 0.01));
+      const progressX = width * 0.5 - progressW / 2;
+      const progressY = height * 0.64;
+      dragCtx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+      dragCtx.fillRect(progressX, progressY, progressW, progressH);
+      const fillGrad = dragCtx.createLinearGradient(progressX, progressY, progressX + progressW, progressY);
+      fillGrad.addColorStop(0, '#ff7f32');
+      fillGrad.addColorStop(1, '#ffe086');
+      dragCtx.fillStyle = fillGrad;
+      dragCtx.fillRect(progressX, progressY, progressW * t, progressH);
+    } else if (dragState.phase === 'cinematic') {
       const pulse = 0.6 + 0.4 * Math.sin(now / 220);
       dragCtx.fillStyle = `rgba(8, 10, 14, ${0.34 - pulse * 0.12})`;
       dragCtx.fillRect(0, 0, width, height);
@@ -3694,7 +3761,17 @@
     dragState.phaseMs += deltaMs;
     dragState.cameraShakeMs = Math.max(0, dragState.cameraShakeMs - deltaMs);
 
-    if (dragState.phase === 'cinematic') {
+    if (dragState.phase === 'splash') {
+      if (dragPhaseLabel) dragPhaseLabel.textContent = 'Splash';
+      if (dragState.phaseMs >= DRAG_SPLASH_MS) {
+        dragState.phase = 'cinematic';
+        dragState.phaseMs = 0;
+        if (dragSubtitle) dragSubtitle.textContent = 'Top Fuel style: launch hard, hold 5.0s, then hit one 110 mph upshift.';
+        if (dragPhaseLabel) dragPhaseLabel.textContent = 'Cinematic';
+        playSound('splash_impact');
+        playSound('drag_intro');
+      }
+    } else if (dragState.phase === 'cinematic') {
       if (dragPhaseLabel) dragPhaseLabel.textContent = 'Cinematic';
       if (dragState.phaseMs >= DRAG_CINEMATIC_MS) {
         dragState.phase = 'countdown';
@@ -5197,6 +5274,7 @@
             phase: dragState.phase,
             milestone: dragState.milestoneTrophy,
             player: {
+              lane: 2,
               gear: dragState.player.gear,
               rpm: Math.round(dragState.player.rpm),
               mph: Math.round(mpsToMph(dragState.player.speed)),
@@ -5213,13 +5291,15 @@
               perfectScoredShifts: dragState.player.perfectScoredShifts
             },
             npcs: dragState.npcs.map((npc, index) => ({
-              lane: index + 2,
+              lane: index + 1,
               laneOffset: Number(npc.laneOffset.toFixed(2)),
               distanceM: Math.round(npc.distanceM)
             })),
             rankPreview: getDragRankFromDistances(dragState.player, dragState.npcs),
             timeRemainingMs:
-              dragState.phase === 'cinematic'
+              dragState.phase === 'splash'
+                ? Math.max(0, Math.round(DRAG_SPLASH_MS - dragState.phaseMs))
+                : dragState.phase === 'cinematic'
                 ? Math.max(0, Math.round(DRAG_CINEMATIC_MS - dragState.phaseMs))
                 :
               dragState.phase === 'race'

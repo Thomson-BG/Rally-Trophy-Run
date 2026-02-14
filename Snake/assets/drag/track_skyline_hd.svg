@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#90c6ff"/>
+      <stop offset="0.42" stop-color="#cfe8ff"/>
+      <stop offset="0.72" stop-color="#7ea8d2"/>
+      <stop offset="1" stop-color="#2f4764"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="52%" cy="23%" r="28%">
+      <stop offset="0" stop-color="#fff8da" stop-opacity="0.95"/>
+      <stop offset="0.42" stop-color="#ffe8b8" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#ffe8b8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tree" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#214d35"/>
+      <stop offset="1" stop-color="#10281c"/>
+    </linearGradient>
+  </defs>
+  <rect width="3840" height="2160" fill="url(#sky)"/>
+  <rect width="3840" height="2160" fill="url(#sun)"/>
+  <g opacity="0.65">
+    <ellipse cx="520" cy="460" rx="340" ry="110" fill="#f8fbff"/>
+    <ellipse cx="1080" cy="380" rx="290" ry="90" fill="#f4f8fd"/>
+    <ellipse cx="1760" cy="420" rx="360" ry="120" fill="#f6f9ff"/>
+    <ellipse cx="2550" cy="350" rx="300" ry="88" fill="#f9fbff"/>
+    <ellipse cx="3180" cy="440" rx="350" ry="120" fill="#f3f8fd"/>
+  </g>
+  <g>
+    <rect y="930" width="3840" height="420" fill="#2e5f88"/>
+    <rect y="1136" width="3840" height="1024" fill="#22384e"/>
+  </g>
+  <g opacity="0.92">
+    <path d="M0 980L180 840L310 980Z" fill="url(#tree)"/>
+    <path d="M220 980L390 810L560 980Z" fill="url(#tree)"/>
+    <path d="M500 980L690 790L860 980Z" fill="url(#tree)"/>
+    <path d="M790 980L980 800L1180 980Z" fill="url(#tree)"/>
+    <path d="M1130 980L1320 780L1530 980Z" fill="url(#tree)"/>
+    <path d="M1480 980L1660 810L1840 980Z" fill="url(#tree)"/>
+    <path d="M1810 980L1990 790L2170 980Z" fill="url(#tree)"/>
+    <path d="M2150 980L2330 810L2510 980Z" fill="url(#tree)"/>
+    <path d="M2480 980L2660 760L2860 980Z" fill="url(#tree)"/>
+    <path d="M2820 980L3020 810L3220 980Z" fill="url(#tree)"/>
+    <path d="M3160 980L3370 780L3560 980Z" fill="url(#tree)"/>
+    <path d="M3480 980L3660 820L3840 980Z" fill="url(#tree)"/>
+  </g>
+  <g opacity="0.35">
+    <rect y="1260" width="3840" height="18" fill="#eff5ff"/>
+    <rect y="1320" width="3840" height="10" fill="#c9d9ef"/>
+    <rect y="1390" width="3840" height="8" fill="#9fb2cb"/>
+  </g>
+</svg>

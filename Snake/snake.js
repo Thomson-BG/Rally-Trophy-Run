@@ -126,9 +126,9 @@
   const DRAG_TRIGGER_INTERVAL = 20;
   const DRAG_CINEMATIC_MS = 6000;
   const DRAG_COUNTDOWN_MS = 3500;
-  const DRAG_RACE_MS = 22000;
+  const DRAG_RACE_MS = 45000;
   const DRAG_RESULTS_MS = 5000;
-  const DRAG_TOTAL_DISTANCE_M = 640;
+  const DRAG_TOTAL_DISTANCE_M = 1920;
   const DRAG_NPC_COUNT = 1;
   const DRAG_SHIFT_COOLDOWN_MS = 160;
   const DRAG_FALSE_START_PENALTY_MS = 900;
@@ -262,6 +262,8 @@
   let frameSampleMs = 16.7;
   let splashState = createInitialSplashState();
   const dragCtx = dragCanvas ? dragCanvas.getContext('2d') : null;
+  const dragBloomCanvas = dragCtx ? document.createElement('canvas') : null;
+  const dragBloomCtx = dragBloomCanvas ? dragBloomCanvas.getContext('2d') : null;
   const dragAssetRegistry = createDragAssetRegistry(DRAG_VISUAL_ASSET_PATHS);
   const dragAsphaltPatternCache = { pattern: null, source: null };
   const slotReelViews = slotReels.map((reel) => ({
@@ -2556,6 +2558,22 @@
       const exhaustY = dragCanvas.clientHeight * 0.88;
       const strength = clamp((player.speed / 52) + (player.shiftBoostMs > 0 ? 0.35 : 0), 0.5, 1.8);
       emitDragExhaust(exhaustX, exhaustY, strength, player.shiftBoostMs > 0 ? 'rgba(255,226,150,0.8)' : 'rgba(255,164,96,0.62)');
+      if (player.speed > 52 || player.shiftBoostMs > 0) {
+        const flameCount = dragState.qualityTier === 'high' ? 4 : dragState.qualityTier === 'medium' ? 3 : 2;
+        for (let i = 0; i < flameCount; i += 1) {
+          pushDragParticle({
+            x: exhaustX + (Math.random() - 0.5) * 18,
+            y: exhaustY + 2 + Math.random() * 6,
+            vx: (Math.random() - 0.5) * 26,
+            vy: -72 - Math.random() * 120,
+            lifeMs: 120 + Math.random() * 150,
+            maxLifeMs: 120 + Math.random() * 150,
+            size: 2.2 + Math.random() * 3.8,
+            glow: 18,
+            color: Math.random() < 0.45 ? 'rgba(255, 238, 174, 0.95)' : 'rgba(255, 116, 44, 0.92)'
+          });
+        }
+      }
     }
 
     player.audioState = dragAudioMode;
@@ -2795,6 +2813,103 @@
     dragCtx.restore();
   }
 
+  function ensureDragBloomSurface(width, height) {
+    if (!dragBloomCanvas || !dragBloomCtx) return false;
+    const targetWidth = Math.max(1, Math.floor(width));
+    const targetHeight = Math.max(1, Math.floor(height));
+    if (dragBloomCanvas.width !== targetWidth || dragBloomCanvas.height !== targetHeight) {
+      dragBloomCanvas.width = targetWidth;
+      dragBloomCanvas.height = targetHeight;
+    }
+    return true;
+  }
+
+  function drawDragLensFlare(width, height, light, speedFactor) {
+    if (!dragCtx) return;
+    const sourceX = light && Number.isFinite(light.x) ? light.x : width * 0.5;
+    const sourceY = light && Number.isFinite(light.y) ? light.y : height * 0.24;
+    const centerX = width * 0.5;
+    const centerY = height * 0.56;
+    const axisX = centerX - sourceX;
+    const axisY = centerY - sourceY;
+    const flareStrength = clamp(0.22 + speedFactor * 0.22, 0.2, 0.55);
+    const ringCount = dragState && dragState.qualityTier === 'high' ? 6 : 4;
+
+    dragCtx.save();
+    dragCtx.globalCompositeOperation = 'screen';
+    for (let i = 0; i < ringCount; i += 1) {
+      const t = i / (ringCount - 1 || 1);
+      const px = sourceX + axisX * (0.12 + t * 0.88);
+      const py = sourceY + axisY * (0.12 + t * 0.88);
+      const radius = lerp(width * 0.01, width * 0.06, 1 - t);
+      const grad = dragCtx.createRadialGradient(px, py, 0, px, py, radius);
+      grad.addColorStop(0, `rgba(255, 236, 196, ${flareStrength * (1 - t * 0.5)})`);
+      grad.addColorStop(1, 'rgba(255, 236, 196, 0)');
+      dragCtx.fillStyle = grad;
+      dragCtx.fillRect(px - radius, py - radius, radius * 2, radius * 2);
+    }
+
+    const streak = dragCtx.createLinearGradient(sourceX - width * 0.2, sourceY, sourceX + width * 0.2, sourceY);
+    streak.addColorStop(0, 'rgba(255, 226, 168, 0)');
+    streak.addColorStop(0.5, `rgba(255, 226, 168, ${flareStrength * 0.7})`);
+    streak.addColorStop(1, 'rgba(255, 226, 168, 0)');
+    dragCtx.fillStyle = streak;
+    dragCtx.fillRect(sourceX - width * 0.2, sourceY - 1.2, width * 0.4, 2.4);
+    dragCtx.restore();
+  }
+
+  function drawDragAtmosphericFog(width, height, road, speedFactor) {
+    if (!dragCtx || !road) return;
+    const horizonFog = dragCtx.createLinearGradient(0, road.horizon - 28, 0, road.roadBottomY);
+    horizonFog.addColorStop(0, `rgba(210, 230, 255, ${0.3 + speedFactor * 0.08})`);
+    horizonFog.addColorStop(0.36, 'rgba(160, 187, 224, 0.07)');
+    horizonFog.addColorStop(1, 'rgba(18, 28, 44, 0)');
+    dragCtx.fillStyle = horizonFog;
+    dragCtx.fillRect(0, road.horizon - 28, width, road.roadBottomY - road.horizon + 28);
+
+    const lowerFog = dragCtx.createLinearGradient(0, road.roadBottomY - 80, 0, height);
+    lowerFog.addColorStop(0, 'rgba(24, 36, 52, 0)');
+    lowerFog.addColorStop(1, `rgba(5, 8, 13, ${0.34 + speedFactor * 0.1})`);
+    dragCtx.fillStyle = lowerFog;
+    dragCtx.fillRect(0, road.roadBottomY - 80, width, height - road.roadBottomY + 80);
+  }
+
+  function applyDragPostProcessing(width, height, speedFactor) {
+    if (!dragCtx) return;
+    if (ensureDragBloomSurface(width, height)) {
+      dragBloomCtx.setTransform(1, 0, 0, 1, 0, 0);
+      dragBloomCtx.clearRect(0, 0, width, height);
+      dragBloomCtx.drawImage(dragCanvas, 0, 0, width, height);
+
+      if ('filter' in dragCtx) {
+        dragCtx.save();
+        dragCtx.globalCompositeOperation = 'screen';
+        dragCtx.filter = `blur(${2 + speedFactor * 6}px) brightness(${1.1 + speedFactor * 0.3}) saturate(1.18)`;
+        dragCtx.globalAlpha = 0.16 + speedFactor * 0.14;
+        dragCtx.drawImage(dragBloomCanvas, 0, 0, width, height);
+        dragCtx.filter = 'none';
+        dragCtx.restore();
+      }
+    }
+
+    const grade = dragCtx.createLinearGradient(0, 0, 0, height);
+    grade.addColorStop(0, 'rgba(108, 170, 255, 0.2)');
+    grade.addColorStop(0.56, 'rgba(255, 188, 104, 0.09)');
+    grade.addColorStop(1, 'rgba(6, 13, 20, 0.36)');
+    dragCtx.save();
+    dragCtx.globalCompositeOperation = 'soft-light';
+    dragCtx.fillStyle = grade;
+    dragCtx.fillRect(0, 0, width, height);
+
+    const vignette = dragCtx.createRadialGradient(width * 0.5, height * 0.54, width * 0.18, width * 0.5, height * 0.54, width * 0.72);
+    vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    vignette.addColorStop(1, `rgba(0, 0, 0, ${0.46 + speedFactor * 0.16})`);
+    dragCtx.globalCompositeOperation = 'multiply';
+    dragCtx.fillStyle = vignette;
+    dragCtx.fillRect(0, 0, width, height);
+    dragCtx.restore();
+  }
+
   function drawDragGrandstand(side, width, height, horizon, flow) {
     if (!dragCtx) return;
     const farX = side < 0 ? width * 0.26 : width * 0.74;
@@ -2948,13 +3063,52 @@
 
     const roadTopY = horizon + 14;
     const roadBottomY = height * 0.88;
-    const roadTopWidth = width * 0.19;
+    const roadTopWidth = width * 0.125;
     const roadBottomWidth = width * 1.04;
 
     const topLeft = width / 2 - roadTopWidth / 2;
     const topRight = width / 2 + roadTopWidth / 2;
     const bottomLeft = width / 2 - roadBottomWidth / 2;
     const bottomRight = width / 2 + roadBottomWidth / 2;
+    const lightVectorX = (width * 0.5 - sunX) / width;
+    const lightVectorY = (roadBottomY - sunY) / Math.max(1, height);
+
+    const poleCount = dragState && dragState.qualityTier === 'high' ? 12 : 8;
+    for (let i = 0; i < poleCount; i += 1) {
+      const t = i / (poleCount - 1 || 1);
+      const y = lerp(roadTopY + 26, roadBottomY - 120, t);
+      const laneT = clamp((y - roadTopY) / (roadBottomY - roadTopY), 0, 1);
+      const leftX = lerp(topLeft - 58, bottomLeft - 120, laneT);
+      const rightX = lerp(topRight + 58, bottomRight + 120, laneT);
+      const poleHeight = lerp(24, 112, laneT);
+      const glowRadius = 4 + laneT * 9;
+
+      [leftX, rightX].forEach((poleX) => {
+        const shadowLen = poleHeight * (0.9 + laneT * 0.8);
+        dragCtx.strokeStyle = `rgba(0, 0, 0, ${0.16 + laneT * 0.12})`;
+        dragCtx.lineWidth = 2 + laneT * 2.2;
+        dragCtx.beginPath();
+        dragCtx.moveTo(poleX, y);
+        dragCtx.lineTo(
+          poleX + lightVectorX * shadowLen * 2.6,
+          y + lightVectorY * shadowLen * 2.2
+        );
+        dragCtx.stroke();
+
+        dragCtx.strokeStyle = '#5f6774';
+        dragCtx.lineWidth = 2 + laneT * 2.6;
+        dragCtx.beginPath();
+        dragCtx.moveTo(poleX, y);
+        dragCtx.lineTo(poleX, y - poleHeight);
+        dragCtx.stroke();
+
+        const glow = dragCtx.createRadialGradient(poleX, y - poleHeight, 0, poleX, y - poleHeight, glowRadius * 3.2);
+        glow.addColorStop(0, `rgba(255, 236, 184, ${0.58 - laneT * 0.24})`);
+        glow.addColorStop(1, 'rgba(255, 236, 184, 0)');
+        dragCtx.fillStyle = glow;
+        dragCtx.fillRect(poleX - glowRadius * 3.2, y - poleHeight - glowRadius * 3.2, glowRadius * 6.4, glowRadius * 6.4);
+      });
+    }
 
     dragCtx.fillStyle = '#3e7cb9';
     dragCtx.beginPath();
@@ -3394,6 +3548,7 @@
       x: road.sunX || width * 0.5,
       y: road.sunY || road.horizon - 60
     };
+    drawDragLensFlare(width, height, light, speedFactor);
 
     const countdownPhase = dragState.phase === 'countdown' ? 'countdown' : dragState.phase === 'race' ? 'race' : 'idle';
     drawDragTreeTower(width * 0.12, road.horizon - 12, clamp(width / 1200, 0.72, 1.2), countdownPhase);
@@ -3427,15 +3582,21 @@
     }
 
     drawDragExhaustFlameShockwave(width, height, now, player, speedFactor);
+    drawDragAtmosphericFog(width, height, road, speedFactor);
 
     if (dragState.particles && dragState.particles.length > 0) {
       dragState.particles.forEach((particle) => {
         const life = clamp(particle.lifeMs / particle.maxLifeMs, 0, 1);
         dragCtx.globalAlpha = life;
         dragCtx.fillStyle = particle.color;
+        if (particle.glow) {
+          dragCtx.shadowBlur = particle.glow * life;
+          dragCtx.shadowColor = particle.color;
+        }
         dragCtx.beginPath();
         dragCtx.arc(particle.x, particle.y, Math.max(0.5, particle.size * life), 0, Math.PI * 2);
         dragCtx.fill();
+        dragCtx.shadowBlur = 0;
       });
       dragCtx.globalAlpha = 1;
     }
@@ -3524,6 +3685,7 @@
     }
 
     dragCtx.restore();
+    applyDragPostProcessing(width, height, speedFactor);
   }
 
   function updateDragShift(deltaMs, now) {

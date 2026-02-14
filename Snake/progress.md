@@ -189,3 +189,11 @@ Original prompt: Build a classic Snake game in this repo with modern skins and a
   - Added dynamic shadowing enhancements: opponent car projected shadows and cockpit interior moving shadow pass.
   - Added full-acceleration exhaust VFX with flame plumes and visible shockwave rings near the exhaust in race phase.
   - `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed after these updates.
+- Drag race extension + next visual pass:
+  - Extended drag track to `1920m` (3x the previous `640m`) so both gears are fully used before finish.
+  - Increased drag race time budget to `45000ms` to match the much longer strip.
+  - Added post-processing pipeline in canvas: bloom/glare blend, color grading, and vignette in drag mode.
+  - Added lens flare pass tied to sun direction, atmospheric fog layering, and stronger dynamic cockpit/world shadowing.
+  - Added dynamic roadside pole lighting with projected shadows for additional depth cues.
+  - Upgraded full-throttle exhaust effects with brighter flames, glow particles, and shockwave rings.
+  - Validation: `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed.

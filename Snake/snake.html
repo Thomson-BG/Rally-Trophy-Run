@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Bulldog Garage Rally - Trophy Run</title>
+    <link rel="stylesheet" href="snake.css" />
+  </head>
+  <body data-skin="ember">
+    <div class="snake-ambient" aria-hidden="true">
+      <div class="glow glow-a"></div>
+      <div class="glow glow-b"></div>
+      <div class="scanlines"></div>
+    </div>
+
+    <main class="snake-shell">
+      <header class="snake-header">
+        <button id="pause-btn" class="top-control-btn" aria-label="Pause game">
+          <span aria-hidden="true">II</span>
+        </button>
+        <div class="top-center-stack">
+          <h1 class="game-wordmark"><span class="accent">BULLDOG</span><span>GARAGE</span></h1>
+          <div class="score-pill">
+            <div class="score-block">
+              <span>Score</span>
+              <strong id="score">0</strong>
+            </div>
+            <div class="score-divider"></div>
+            <div class="score-block score-best">
+              <span>Best</span>
+              <strong id="best">0</strong>
+            </div>
+          </div>
+          <div class="top-utility-actions">
+            <button id="scoreboard-btn" class="mini-control-btn">Scoreboard</button>
+            <button id="settings-btn" class="mini-control-btn">Settings</button>
+          </div>
+        </div>
+        <button id="restart-btn-side" class="top-control-btn" aria-label="Restart game">
+          <span aria-hidden="true">&#8635;</span>
+        </button>
+      </header>
+
+      <section class="snake-stage">
+        <div class="snake-game-column">
+          <div class="snake-board">
+            <canvas id="snake-canvas" aria-label="Rally Trophy Run game"></canvas>
+            <div id="snake-overlay" class="snake-overlay hidden" role="status" aria-live="polite">
+              <div class="overlay-card">
+                <h2 id="overlay-title">Paused</h2>
+                <p id="overlay-subtitle">Press space to resume.</p>
+                <div class="overlay-actions">
+                  <button id="resume-btn" class="ghost">Resume</button>
+                  <button id="restart-btn" class="primary">Restart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="snake-mobile-controls" aria-label="Directional controls">
+        <div class="dpad-shell">
+          <button class="dpad-btn dpad-up" data-dir="up" aria-label="Move up">&#9650;</button>
+          <button class="dpad-btn dpad-left" data-dir="left" aria-label="Move left">&#9664;</button>
+          <button class="dpad-btn dpad-right" data-dir="right" aria-label="Move right">&#9654;</button>
+          <button class="dpad-btn dpad-down" data-dir="down" aria-label="Move down">&#9660;</button>
+          <div class="dpad-core"></div>
+        </div>
+        <p class="controls-signature">MR. THOMSON</p>
+      </section>
+    </main>
+    <div
+      id="splash-modal"
+      class="splash-modal"
+      data-phase="splash_grow"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="splash-title"
+      aria-live="polite"
+    >
+      <div class="splash-content">
+        <h2 id="splash-title" class="visually-hidden">Bulldog Garage Rally: Trophy Run</h2>
+        <img
+          id="splash-logo"
+          class="splash-logo"
+          src="assets/bulldog-garage-rally-combined.png"
+          alt="Bulldog Garage Rally Trophy Run logo"
+        />
+        <p id="splash-prompt" class="splash-prompt">Tap the screen or press any key to start</p>
+      </div>
+    </div>
+    <div id="settings-modal" class="settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-card">
+        <div class="modal-head">
+          <h2 id="settings-title">Settings</h2>
+          <button id="settings-close" class="ghost">Close</button>
+        </div>
+        <label class="settings-row">
+          <span>Sound</span>
+          <select id="sound-setting">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+        <label class="settings-row">
+          <span>Virtual Keys</span>
+          <select id="virtual-controls-setting">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+        <div class="settings-group">
+          <h3>Skins</h3>
+          <div class="skin-options" role="listbox" aria-label="Snake skins">
+            <button class="skin-chip active" data-skin="ember" role="option" aria-selected="true">Ember</button>
+            <button class="skin-chip" data-skin="neon" role="option" aria-selected="false">Neon</button>
+            <button class="skin-chip" data-skin="frost" role="option" aria-selected="false">Frost</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="scoreboard-modal" class="scoreboard-modal hidden" role="dialog" aria-modal="true" aria-labelledby="scoreboard-title">
+      <div class="scoreboard-card">
+        <div class="modal-head">
+          <h2 id="scoreboard-title">Top 8 Scores</h2>
+          <button id="scoreboard-close" class="ghost">Close</button>
+        </div>
+        <ol id="leaderboard-list" class="leaderboard-list"></ol>
+      </div>
+    </div>
+    <div id="welcome-modal" class="welcome-modal hidden" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div class="welcome-card">
+        <h2 id="welcome-title">Welcome</h2>
+        <p id="welcome-message"></p>
+        <button id="welcome-action" class="primary">Next</button>
+      </div>
+    </div>
+    <div id="drag-modal" class="drag-modal hidden" role="dialog" aria-modal="true" aria-labelledby="drag-title">
+      <div class="drag-card">
+        <div class="drag-head">
+          <div>
+            <h2 id="drag-title">Drag Strip Shift</h2>
+            <p id="drag-phase-label" class="drag-phase-label">Cinematic</p>
+          </div>
+          <div class="drag-meta">
+            <span>Quality: <strong id="drag-quality">high</strong></span>
+            <span>Milestone: <strong id="drag-milestone">20</strong></span>
+          </div>
+        </div>
+        <p id="drag-subtitle" class="drag-subtitle">Racers to line... build pressure.</p>
+        <div class="drag-tree" id="drag-tree">
+          <span class="tree-light pre"></span>
+          <span class="tree-light pre"></span>
+          <span class="tree-light amber"></span>
+          <span class="tree-light amber"></span>
+          <span class="tree-light amber"></span>
+          <span class="tree-light green"></span>
+          <span class="tree-light red"></span>
+        </div>
+        <div class="drag-stage">
+          <div class="drag-canvas-wrap">
+            <canvas id="drag-canvas" aria-label="Drag Strip Shift mini game"></canvas>
+            <button id="drag-shift-overlay-btn" class="drag-overlay-shift-btn" aria-label="Shift up">
+              Shift Up
+            </button>
+          </div>
+          <div class="drag-hud">
+            <div class="drag-hud-grid">
+              <div class="drag-stat"><span>Gear</span><strong id="drag-gear">1</strong></div>
+              <div class="drag-stat"><span>Speed</span><strong id="drag-speed">0 mph</strong></div>
+              <div class="drag-stat"><span>Rank</span><strong id="drag-rank">--</strong></div>
+              <div class="drag-stat"><span>Points</span><strong id="drag-points">0</strong></div>
+              <div class="drag-stat"><span>Time</span><strong id="drag-time">00.0s</strong></div>
+            </div>
+            <div class="drag-rpm-row">
+              <span id="drag-rpm-value">RPM 1200</span>
+              <div class="drag-rpm-track">
+                <div id="drag-rpm-fill" class="drag-rpm-fill"></div>
+              </div>
+            </div>
+            <p id="drag-distance" class="drag-distance">Distance: 0m / 640m</p>
+          </div>
+          <div class="drag-touch-controls">
+            <button id="drag-launch-btn" class="drag-touch-btn launch">Launch</button>
+            <button id="drag-shift-btn" class="drag-touch-btn shift">Shift Up</button>
+            <p>Tap Launch at green, hold 5.0s, then tap Shift Up near 110 mph.</p>
+          </div>
+        </div>
+        <div id="drag-results" class="drag-results hidden">
+          <h3 id="drag-results-rank">Finish: #1</h3>
+          <p id="drag-results-reward">Reward: +15000 points</p>
+          <p id="drag-results-buff">Buff: +15% speed for 15s</p>
+          <button id="drag-continue-btn" class="primary">Continue</button>
+        </div>
+      </div>
+    </div>
+    <div id="slot-modal" class="slot-modal hidden" role="dialog" aria-modal="true" aria-labelledby="slot-title">
+      <div class="slot-card">
+        <div class="slot-top-row">
+          <h2 id="slot-title">Cherry Slots</h2>
+          <div class="slot-pulls-pill">
+            Pulls Left
+            <strong id="slot-pulls-left">3</strong>
+          </div>
+        </div>
+        <div class="slot-machine">
+          <div class="slot-machine-marquee">
+            <span class="slot-bulb"></span>
+            <span class="slot-machine-name">Bulldog Lucky Cherry</span>
+            <span class="slot-bulb"></span>
+          </div>
+          <div id="slot-jackpot-banner" class="slot-jackpot-banner hidden" aria-live="assertive">JACKPOT</div>
+          <div class="slot-window-shell">
+            <div class="slot-window-glass">
+              <div class="slot-payline" aria-hidden="true"></div>
+              <div class="slot-reels">
+                <div class="slot-reel" id="slot-reel-1" role="img" aria-label="Reel 1">
+                  <div class="slot-strip"></div>
+                </div>
+                <div class="slot-reel" id="slot-reel-2" role="img" aria-label="Reel 2">
+                  <div class="slot-strip"></div>
+                </div>
+                <div class="slot-reel" id="slot-reel-3" role="img" aria-label="Reel 3">
+                  <div class="slot-strip"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slot-paytable">
+            <span>3x Cherry = 1000</span>
+            <span>3x Star = 1500</span>
+            <span>2 Matching = 40%</span>
+          </div>
+        </div>
+        <p id="slot-message" class="slot-message"></p>
+        <button id="slot-action" class="primary slot-action-btn">Spin (3)</button>
+      </div>
+    </div>
+    <div id="resume-modal" class="resume-modal hidden" role="dialog" aria-modal="true" aria-labelledby="resume-title">
+      <div class="resume-card">
+        <h2 id="resume-title">Ready?</h2>
+        <p id="resume-message">Tap to resume</p>
+        <button id="resume-action" class="primary">Resume</button>
+      </div>
+    </div>
+    <div id="score-entry" class="score-entry hidden" role="dialog" aria-modal="true" aria-labelledby="score-entry-title">
+      <form id="score-form" class="score-form">
+        <h2 id="score-entry-title">New Top Score</h2>
+        <p id="score-entry-score" class="score-entry-score"></p>
+        <label>
+          <span id="score-id-label">Student ID</span>
+          <input
+            id="score-initials"
+            name="studentId"
+            maxlength="6"
+            inputmode="numeric"
+            pattern="\\d{6}"
+            autocomplete="off"
+            required
+          />
+        </label>
+        <label>
+          Period
+          <select id="score-period" name="period" required>
+            <option value="">Select period</option>
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+            <option value="6">Period 6</option>
+            <option value="Staff">Staff</option>
+            <option value="Non-Auto Student">Non-Auto Student</option>
+          </select>
+        </label>
+        <p id="score-entry-error" class="score-entry-error hidden" aria-live="polite"></p>
+        <div class="score-form-actions">
+          <button type="button" id="score-cancel" class="ghost">Skip</button>
+          <button type="submit" class="primary">Save</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="snake.js"></script>
+  </body>
+</html>

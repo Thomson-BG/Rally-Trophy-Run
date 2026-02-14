@@ -1,0 +1,191 @@
+Original prompt: Build a classic Snake game in this repo with modern skins and animations.
+
+- Reskinned Snake into Rally: Trophy Run with muscle car head, dust trail, and trophy pickups.
+- Added Apps Script high score support with top-8 leaderboard UI and entry modal.
+- Added Apps Script backend template in /Users/joshuathomson/Documents/Projects/Codex/Snake/apps-script.
+- Playwright tests pending: playwright package missing in environment.
+- Renamed UI to "Rally: Trophy Run" and added footer credits.
+- Added leaderboard UI + score entry modal for top-8 scores.
+- Apps Script deployment instructions added in apps-script/README.md.
+- Moved leaderboard out of gameplay area into right-side panel.
+- Ensured score prompt waits for leaderboard load and posts immediately on submit.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Prevented repeated score prompt after submission by tracking handled scores per run.
+- Avoided Apps Script CORS preflight by removing custom JSON headers; added GET fallback refresh.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Removed Back to Inspection button and replaced footer with long directions copy.
+- Adjusted footer typography for readability.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added trophy expiration/penalty/respawn timer and speed scaling per trophy.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added graffiti-style Bulldog Garage SVG logo and updated header layout.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added graffiti logo asset and header styling; test run attempted (Playwright missing).
+- Shrunk graffiti logo size to ~1/8.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Doubled graffiti logo size; test run attempted (Playwright missing).
+- Replaced mobile D-pad with joystick and added swipe controls.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Disabled scroll/gesture on board for swipe control; bound touchstart to board with preventDefault.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Replaced Rally: Trophy Run text with image asset and added sizing styles.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Positioned Rally title image to the right of Bulldog logo and scaled to 2/3 size.
+- Swapped header logos for combined Bulldog Garage Rally image.
+- Halved combined header logo size.
+- Centered the combined header logo.
+- Centered header container so the logo block is centered in the page.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added start-still behavior until direction input; paused timers until movement.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added special items: clock, tire, oil puddle, police roadblock, coin with timers/effects.
+- Added speed slow/countdown and reversed controls effects.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Halved spawn intervals for all random items (clock, tire, oil, police, coin).
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Increased coin score to 250.
+- Added two-step welcome modal shown on initial load (session-based).
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Ensured welcome modal always shows on load and set higher z-index.
+- Fixed welcome modal string syntax error that broke JS execution.
+- Removed scanlines and switched page/game background to light gray for clarity.
+- Darkened grid lines and added board fill variable so the grid is visible on the light board.
+- Reduced canvas noise overlay opacity for clarity.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Switched page background to dark gray and updated board fill + grid line contrast for visibility.
+- Removed the moving board sweep (yellow scan line).
+- Added stop sign power-up with random spawn timers, 7s lifetime, and 50% speed reduction on pickup.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added Screen Lock toggle above the board to prevent scrolling on touch devices.
+- Added Web Audio SFX for direction changes, crashes, and item pickups/penalties.
+- Updated leaderboard to use 6-digit Student ID and added Staff/Non-Auto Student period options.
+- Updated Apps Script Code.gs to store Student ID and new period options.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Improved screen lock for mobile (body fixed + touchmove prevention).
+- Added fullscreen button next to screen lock toggle.
+- Added cherry pickup + slot machine mini-game with resume countdown.
+- Added bonus race round every 10 trophies with NPC racers and rank-based rewards.
+- Test run attempted: Playwright missing (ERR_MODULE_NOT_FOUND).
+- Added iPhone-safe fullscreen fallback (pseudo fullscreen) when Fullscreen API is unavailable/rejected.
+- Strengthened mobile Screen Lock by freezing html/body scroll position and preventing touchmove/wheel while locked.
+- Removed fullscreen and screen-lock controls per latest UX request.
+- Added top toolbar settings + scoreboard controls that pause gameplay while modals are open.
+- Moved skins and sound toggle into Settings modal; moved Top 8 list into Scoreboard modal.
+- Removed footer directions block and compacted score/best into the board toolbar.
+- Improved mobile width fit by tightening shell padding and hiding side panel on coarse/mobile screens.
+- Moved settings/scoreboard toolbar outside `.snake-board` into a new top strip directly above the board to avoid swipe/touch interception.
+- Scoped swipe touch handling to `#snake-canvas` only; toolbar controls now tap reliably on mobile.
+- Added splash overlay state machine with phases (`splash_grow` -> `splash_shrink` -> `splash_wait_input`), logo scaling animation, and start prompt.
+- Splash now gates gameplay and requires tap/key input before showing the existing two-step welcome modal.
+- Added splash SFX hooks (rise/impact/settle/prompt/start) with gesture-safe audio enabling.
+- Updated `render_game_to_text` to report `mode: "splash"` and include `splash` phase/elapsed metadata when active.
+- Test run attempted with develop-web-game Playwright client; failed because `playwright` package is not installed (`ERR_MODULE_NOT_FOUND`).
+- Refreshed overall UI styling based on provided stitch references (dark carbon/glass panels, neon ember accents, racing typography, stronger board chrome and modal styling).
+- Fixed high-score entry validation flow and surfaced submit errors in-modal instead of silently failing.
+- Added Staff-specific score input mode: when period is `Staff`, entry accepts name up to 10 chars; non-staff periods require 6-digit student ID.
+- Updated Apps Script backend to accept Staff names and preserve 6-digit student IDs (including leading zeros) for non-staff entries.
+- Updated splash overlay background to solid black and made first tap/key dismiss splash immediately.
+- Reworked game HUD/layout to match the provided UI reference: top control bar with circular pause/restart, centered BULLDOGGARAGE wordmark, and in-bar score/best panel.
+- Replaced joystick controls with a large on-screen D-pad (up/down/left/right + center core) and bottom signature line.
+- Updated board chrome/grid styling toward the reference look (dark board, orange line accents, minimal rounded frame).
+- Updated car/dust rendering to block-style segments matching the reference visual direction.
+- Removed bonus round trigger after trophy collection (bonus mini-game no longer starts).
+- Added settings toggle for virtual keys (`Virtual Keys` on/off) with mobile-aware visibility; controls are now mobile-only and can be disabled to free vertical space.
+- Upgraded cherry slot machine to mechanical-style spinning reels with animated tumblers, stronger win/jackpot SFX, and red flashing `JACKPOT` banner on highest payout.
+- Added mobile gesture lock: disabled double-tap zoom and disabled touch scrolling on mobile devices.
+- Updated post-slot resume flow: after countdown completes, car remains stationary until a new direction input/swipe is provided.
+- Set slot jackpot odds to 1:75 by controlling reel outcomes so jackpot only occurs on the configured probability.
+- Rebuilt cherry slot machine UI to a high-fidelity mechanical cabinet style: marquee lights, glass reel window, center payline, animated jackpot banner, and responsive paytable.
+- Replaced text-only reels with true tumbler strips (`.slot-strip`) that render symbol tiles (icon + label) and spin with staggered reel timing, easing, wobble, and mechanical stop behavior.
+- Added weighted slot symbols and kept jackpot logic at 1:75 for max-payout triple matches; updated reel ARIA labels and pulls-left meter.
+- Upgraded slot audio cues for lever pull, reel ticking, reel stop clacks, wins, and jackpot alarm layering.
+- Test run attempted with develop-web-game Playwright client after slot upgrade; still blocked because `playwright` package is missing (`ERR_MODULE_NOT_FOUND`).
+- Deployed updated slot-machine build to Vercel production.
+- Production alias: https://bulldog-garage-rally.vercel.app
+- Build URL: https://bulldog-garage-rally-jh91os8hn-thomson-bgs-projects.vercel.app
+- Replaced stale bonus-round implementation with a new Drag Strip Shift mini-game system.
+- Added drag modal UI in `snake.html` with cinematic header, tree lights, race canvas, live HUD, mobile launch/shift buttons, and results panel.
+- Added large drag-mini-game style block in `snake.css` including quality-tier classes (`drag-quality-high|medium|low`) and responsive mobile control treatment.
+- Implemented deterministic Drag Strip Shift logic in `snake.js`: phases (`cinematic`, `countdown`, `race`, `results`), seeded obstacle/NPC generation, reaction launch, timed shifting, lane dodging, crash penalties, and rank scoring.
+- Trigger logic now uses milestone offset requested by user: first trigger at trophy #3, then every 20 trophies afterward (3, 23, 43, ...).
+- Added ranked rewards (15000/10000/5000/0) and top-2 post-race buff (+15% speed for 15s) using `dragBuffMultiplier` and `dragBuffMsRemaining` state.
+- Integrated drag lifecycle into main loop priority and full-world pause behavior while drag is active.
+- Extended `render_game_to_text` with `mode: "drag_shift"` and `dragShift` payload details for automation parity.
+- Added drag SFX events (intro/tree/green/launch/shift/hit/finish) and retained existing sound-toggle behavior.
+- JS syntax validation passed: `node --check snake.js`.
+- Playwright E2E still unavailable in environment because `playwright` package is missing.
+- Upgraded Drag Strip Shift visuals toward production quality: richer night-sky/cityline rendering, improved road materials, dynamic speed streaks, finish-line treatment, car detail shaders, glow/lighting pass, and results bloom.
+- Added adaptive particle system (exhaust/smoke/sparks) with quality-tier caps and per-frame particle simulation for high/medium/low modes.
+- Reworked drag physics model with gear ratios, final drive, wheel radius, torque curve, traction limit, aero drag, rolling resistance, and slip handling for more realistic acceleration behavior.
+- Added smoother lane dynamics using `laneTarget` + `lanePos` interpolation for player and NPCs, improved NPC obstacle avoidance decisions, and higher-fidelity collision detection in lane space.
+- Enhanced drag HUD behavior with redline-reactive RPM glow and richer result summary (reward + buff + reaction time + hit count).
+- Confirmed syntax validity after upgrades: `node --check snake.js` passed.
+- Reworked Drag Strip Shift to cockpit-focused gameplay: removed steering + obstacle systems and shifted to launch + 6-gear timing only.
+- Updated drag scoring to skill-based points with max 15,000 (`Perfect Launch` + scored perfect shifts on 1→2, 2→3, 4→5, 5→6). Added fallback rule: if player never shifts and finishes 4th, award 300 points.
+- Added 6-gear drag physics tuning (`DRAG_GEAR_RATIOS` expanded to 6, updated RPM targets and quality windows) and revised NPC race simulation for straight-line drag only.
+- Replaced drag race rendering with cockpit-style camera treatment (windshield road perspective, horizon/lighting, high-speed streaks, opponent cars ahead, dashboard/tachometer HUD with shift window highlight).
+- Added drag HUD points stat (`#drag-points`) and updated touch instructions to launch/shift-only flow.
+- Updated drag payload in `render_game_to_text` to include points/launch/shift metrics and lane offsets for NPC visualization.
+- Validation: `node --check snake.js` passed.
+- Playwright run attempted via develop-web-game skill client; blocked by missing dependency: `ERR_MODULE_NOT_FOUND: playwright`.
+- Production deploy complete after cockpit/shift-only drag update.
+- Production URL: https://bulldog-garage-rally.vercel.app
+- Deployment build URL: https://bulldog-garage-rally-hc0zmkk2r-thomson-bgs-projects.vercel.app
+- Updated drag controls per request: in drag mode desktop now uses Space as unified primary input (launch during countdown/start, then shift during race).
+- Added mobile tap-to-upshift on the drag canvas and added in-canvas overlay Shift Up button (`#drag-shift-overlay-btn`).
+- Updated drag mobile instructions text to reflect tap-to-shift behavior.
+- Validation: `node --check snake.js` passed.
+- Deployed unified Space/tap shift-control update to Vercel production.
+- Production URL: https://bulldog-garage-rally.vercel.app
+- Deployment build URL: https://bulldog-garage-rally-qza9i9vk2-thomson-bgs-projects.vercel.app
+- Reworked drag mini-game visuals toward NHRA-style first-person cockpit framing based on user reference.
+- Updated drag canvas rendering pipeline:
+  - daylight sky + cloud layer
+  - mirrored grandstands with crowd/flags
+  - dual-lane drag strip with concrete walls, blue aprons, sponsor panels, and rubber groove marks
+  - on-track left-side Christmas tree tower rendering synced to countdown/race phase
+  - revised opponent dragster silhouettes in lane perspective
+  - cockpit canopy/frame/hood/dashboard/hands overlay and right-side tachometer cluster
+  - top HUD with position, seconds left, and points/target display
+  - shift prompt remains tied to RPM window.
+- Updated drag canvas styling in CSS for brighter daytime NHRA look.
+- Validation: `node --check snake.js` passed.
+- Playwright check attempted but blocked by missing dependency: `ERR_MODULE_NOT_FOUND: playwright`.
+- Shifted Drag Strip mode to NHRA-style simplified run: launch + single upshift only (2 gears total).
+- Updated drag gear model/constants: `DRAG_GEAR_RATIOS` reduced to 2 gears and shift targets reduced to one scored shift (`1->2`).
+- Updated scoring for 2-action run:
+  - max remains 15,000
+  - launch + single shift now carry full scoring weight (launch max 7,500 + shift max 7,500)
+  - retained fallback: no shift + last place => 300 points.
+- Reduced drag opponents to one NPC lane rival (`DRAG_NPC_COUNT = 1`) for NHRA-style two-lane head-to-head feel.
+- Added layered continuous drag engine SFX using Web Audio nodes (idle layer + low/mid harmonics + combustion/noise band), with live modulation from RPM/speed/throttle and launch/shift boost behavior.
+- Engine audio lifecycle integrated with drag mode start/close/restart and sound toggle handling.
+- Further visual pass toward NHRA reference: brighter daytime strip, grandstands/crowd/flags, side walls + sponsor panels, Christmas tree tower, cockpit frame/dashboard/hands, right-side tach cluster, race overlays.
+- Validation:
+  - `node --check snake.js` passed.
+  - Playwright automation attempt blocked due missing dependency (`ERR_MODULE_NOT_FOUND: playwright`).
+- Deployed to Vercel production:
+  - Live URL: https://bulldog-garage-rally.vercel.app
+  - Build URL: https://bulldog-garage-rally-ooaik6wab-thomson-bgs-projects.vercel.app
+- Implemented NHRA Top Fuel spec retune in drag mini-game:
+  - Track distance now `1000ft` (`304.8m`), 2-gear model (`1->2`), and max speed cap increased to `155 m/s` (`~347 mph`).
+  - Added hard shift lockout (`5000ms`) and speed-target shift scoring centered on `110 mph` with points buckets (7500/6000/4200/2200/800).
+  - Added launch scoring buckets aligned to 7500/6000/4200/2200 with false-start support.
+  - Added telemetry fields in `render_game_to_text`: `mph`, `launchElapsedMs`, `shiftLockRemainingMs`, `shiftTargetMph`, `hasShifted`, and drag `audioState`.
+- Upgraded drag audio system to sample-first WebAudio with fallback:
+  - Added optional sample manifest for `assets/audio/drag/*.ogg` loops/transients.
+  - Implemented runtime sample loading + playback graph (idle/high-gear/crowd loops, launch burst, shift transient, limiter chop).
+  - Preserved synth fallback if samples are missing, and kept Sound On/Off compatibility.
+- Added optional HD drag visual asset pipeline:
+  - Added optional drag visual manifest for `assets/drag/*`.
+  - If assets exist, renderer now overlays skyline/grandstand/cockpit/dashboard textures and asphalt tile detail; otherwise procedural rendering remains active.
+  - Added speed-linked motion blur pass and HUD polish updates for readability.
+- Validation:
+  - `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed.
+  - develop-web-game Playwright client run attempted; blocked by missing dependency (`ERR_MODULE_NOT_FOUND: playwright`).
+- Drag visual + track-length upgrade:
+  - Increased drag strip distance to `640m` (more than 2x the previous `304.8m`) and updated UI copy.
+  - Added dynamic lighting layers in drag scene: animated sun position, volumetric-style light rays, specular track highlights, and moving shadow bands.
+  - Added dynamic shadowing enhancements: opponent car projected shadows and cockpit interior moving shadow pass.
+  - Added full-acceleration exhaust VFX with flame plumes and visible shockwave rings near the exhaust in race phase.
+  - `node --check /Users/joshuathomson/Documents/Projects/Codex/Snake/snake.js` passed after these updates.

@@ -124,6 +124,7 @@
 
   const DRAG_FIRST_TRIGGER_TROPHY = 3;
   const DRAG_TRIGGER_INTERVAL = 20;
+  const DRAG_MINIGAME_ENABLED = false;
   const DRAG_CINEMATIC_MS = 6000;
   const DRAG_SPLASH_MS = 2600;
   const DRAG_COUNTDOWN_MS = 3500;
@@ -1605,12 +1606,14 @@
   }
 
   function isDragTriggerTrophy(trophiesCollected) {
+    if (!DRAG_MINIGAME_ENABLED) return false;
     if (trophiesCollected === DRAG_FIRST_TRIGGER_TROPHY) return true;
     if (trophiesCollected < DRAG_FIRST_TRIGGER_TROPHY) return false;
     return (trophiesCollected - DRAG_FIRST_TRIGGER_TROPHY) % DRAG_TRIGGER_INTERVAL === 0;
   }
 
   function getDragMilestone(trophiesCollected) {
+    if (!DRAG_MINIGAME_ENABLED) return 0;
     if (trophiesCollected < DRAG_FIRST_TRIGGER_TROPHY) return 0;
     return 1 + Math.floor((trophiesCollected - DRAG_FIRST_TRIGGER_TROPHY) / DRAG_TRIGGER_INTERVAL);
   }
@@ -2236,6 +2239,7 @@
   }
 
   function openDragShiftRound() {
+    if (!DRAG_MINIGAME_ENABLED) return;
     if (!dragModal || !dragCanvas || !dragCtx) return;
     paused = false;
     setOverlay(null);
